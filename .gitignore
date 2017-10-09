@@ -1,0 +1,16 @@
+
+*.sln
+*.db
+*.out
+*.recipe
+*.merged
+*.user
+*.vcxproj
+.vs/BluetoothSphero/v15/.suo
+*.suo
+*.tlog
+*.log
+*.gif
+*.png
+*.html
+*.css
