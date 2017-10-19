@@ -26,10 +26,14 @@ int main(int argc, char **argv)
 	//13 = 00001101
 	// 11110010 = F2
 	// Open a socket
-	s = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-	if (s < 0) {
-		perror("Unable to open socket");
-	}
+	s = create_socket(dest,&addr,&loc_addr);
+	send_message(&s,);
+	
+	close(s);
+	return 0;
+}
+
+int create_socket(char addr,sockaddr_l2 *addr,sockaddr_l2 *loc_addr){
 
 	// Connection parameters 
 	addr.l2_family = AF_BLUETOOTH;
@@ -42,7 +46,11 @@ int main(int argc, char **argv)
 	loc_addr.l2_bdaddr = (bdaddr_t) { {0, 0, 0, 0, 0, 0} };
 	loc_addr.l2_cid = htobs(4);
 	loc_addr.l2_bdaddr_type = BDADDR_LE_RANDOM;
-	
+	int s;
+	s = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+	if (s < 0) {
+		perror("Unable to open socket");
+	}
 
 	if (bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr)) < 0)
 	{
@@ -56,48 +64,16 @@ int main(int argc, char **argv)
 		perror("Unable to connect");
 		return -1;
 	}
+
+}
+size_t send_message(int *bl_sock, char message){
+
+	size_t n = sizeof() / sizeof([0])
+
+	int status =write(*bl_sock, message, lenght);
+	if(status < 0){
+		perror("Unable to write");
+	}
 	
-	printf("Connected to: %s\n", dest);
-	//while (1) {
-
-		status = write(s, gattmessage, 8);
-		if (status < 0)
-		{
-			perror("Unable to write");
-			return -1;
-		}
-		printf("Message Send  \n");
-		
-		status = write(s, message1, 10);
-		if (status < 0)
-		{
-			perror("Unable to write");
-			return -1;
-		}
-		printf("Message1 Send  \n");
-		status = write(s, message2, 4);
-		if (status < 0)
-		{
-			perror("Unable to write");
-			return -1;
-		}
-		printf("Message2 Send  \n");
-
-		while (1)
-		{
-			status = write(s, message3, 14);
-			if (status < 0)
-			{
-				perror("Unable to write");
-				return -1;
-			}
-			printf("Message3 Send  \n");
-			usleep(1000000);
-		}
-
-
-	//}
-
-	close(s);
-	return 0;
+	return status;
 }
