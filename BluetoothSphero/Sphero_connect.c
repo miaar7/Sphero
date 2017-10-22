@@ -22,6 +22,7 @@
 int connectSphero(int* s, char* dest, struct sockaddr_l2 *addr, struct sockaddr_l2 *loc_addr);
 int send_message(int* bl_sock, char* message, int length);
 int wakeSphero(int*bl_sock);
+unsigned char getCheckSum(char* command, int length);
 
 int main(int argc, char **argv)
 {
@@ -29,10 +30,18 @@ int main(int argc, char **argv)
 	struct sockaddr_l2 loc_addr = { 0 };
 	int s;
 	int status;
+	int bytes_read;
+	char buf[20] = { 0 };
 	char dest[18] = "CD:72:26:BA:E7:32"; // Address of Sphero
 
-	char command[14] = { WRITE, CommandsCharacteristic, 0x00, 0xff, 0xfe, 0x02, 0x30, 0x00, 0x05, 0x96, 0x00, 0x14, 0x01, 0x1d };
+	char stream[19] = { WRITE, CommandsCharacteristic, 0x00, 0xff, 0xfe, 0x02, 0x11, 0x00, 0x0a, 0x00, 0x0a, 0x00, 0x01, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00};// Start stream
+	getCheckSum(&stream, sizeof(stream));
+	char command[14] = { WRITE, CommandsCharacteristic, 0x00, 0xff, 0xff, 0x02, 0x30, 0x00, 0x05, 0x96, 0x00, 0x14, 0x01, 0x00};
+    getCheckSum(&command, sizeof(command));
+	//printf("%x,\n", command[sizeof(command)-1]);
 	
+	
+	//char ping[10] = { WRITE, CommandsCharacteristic,0x00, 0xFF, 0xFF, 0x00, 0x01, 0x52, 0x01, 0xab };
 	// Open a socket	
 	if (connectSphero(&s, &dest, &addr, &loc_addr) < 0) {
 		return -1;
@@ -41,13 +50,34 @@ int main(int argc, char **argv)
 	if (wakeSphero(&s) < 0) {
 		return -1;
 	}
+	usleep(3000000);
+	send_message(&s, &stream, sizeof(stream));
+	int i = 0;
+	
 	while (1) 
 	{
-		if (send_message(&s, &command, sizeof(command)) < 0)
-		{
-			return -1;
+		// read data from the client
+		bytes_read = read(s, &buf, sizeof(buf));
+		if (bytes_read > 0) {
+			//for (i = 0; i < bytes_read; i++)
+			//{
+			//}
+			if (send_message(&s, &command, sizeof(command)) < 0)
+			{
+				return 0;
+			}
+			printf("[%d],%d", buf[0],i);
+			printf("\n");			
 		}
-		usleep(1000000);
+		else
+		{
+			perror("Unable to read");
+			return;
+		}
+		
+
+		i++;
+		usleep(1);
 	}
 	close(s);
 	return 0;
@@ -91,7 +121,7 @@ int connectSphero(int* s,char* dest, struct sockaddr_l2 *addr, struct sockaddr_l
 	
 }
 int send_message(int *bl_sock, char* message, int length) {
-	printf("Sending message  \n");
+	//printf("Sending message  \n");
 	int status = write((*bl_sock), message, length);
 	return status;
 }
@@ -114,4 +144,13 @@ int wakeSphero(int*bl_sock) {
 	}
 	return 0;
 
+}
+unsigned char getCheckSum(char* command,int length) {
+	unsigned char checksum = 0x00;							// + checksum is last byte in the packet
+	for (int i = 5; i<length; i++) {			// + sum of all bytes starting after the
+		checksum += command[i];				//   first two SOP bytes until the end
+	}											//   of the data payload.
+	command[length - 1] = checksum ^ 0xFF;
+	
+	return command[length-1];
 }
