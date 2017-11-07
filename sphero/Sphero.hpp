@@ -499,6 +499,11 @@ class Sphero
 		const vector<dataTypes> getTypesList();
 
 		/**
+		* @return The the number of senors registered for streaming
+		*/
+		int getNumberOfStreaming();
+
+		/**
 		 * @brief checkValid : Checks the validity of a packet length
 		 * @param len : The packet length
 		 * @return true if the length matches with the current parameters

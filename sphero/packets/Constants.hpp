@@ -133,14 +133,14 @@ namespace mask
 
 	static uint32_t const FILTERED_PITCH_IMU = 0x00040000;
 	static uint32_t const FILTERED_ROLL_IMU = 0x00020000;
-	static uint32_t const FILTERED_YAW_IMU = 0x00010000;
+	static uint32_t const FILTERED_YAW_IMU = 0x00010000; 
 
-	static uint32_t const FILTERED_ACCEL_X = 0x00008000;
-	static uint32_t const FILTERED_ACCEL_Y = 0x00004000;
+	static uint32_t const FILTERED_ACCEL_X = 0x00008000; 
+	static uint32_t const FILTERED_ACCEL_Y = 0x00004000; 
 	static uint32_t const FILTERED_ACCEL_Z = 0x00002000;
 
-	static uint32_t const FILTERED_RIGHT_MOTOR_BACK_EMF = 0x00000040;
-	static uint32_t const FILTERED_LEFT_MOTOR_BACK_EMF = 0x00000020;
+	static uint32_t const FILTERED_RIGHT_MOTOR_BACK_EMF = 0x00000040; 
+	static uint32_t const FILTERED_LEFT_MOTOR_BACK_EMF = 0x00000020; 
 }
 
 	//for mask2

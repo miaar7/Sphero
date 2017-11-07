@@ -269,8 +269,8 @@ bool Sphero::connect()
 
 		//setDataStreaming(2, 1, 0, 0,
 		//		mask2::ODOMETER_X | mask2::ODOMETER_Y | mask2::ACCELONE_0 |mask2::VELOCITY_X | mask2::VELOCITY_Y);
-		setDataStreaming(10, 1, mask::FILTERED_ROLL_IMU, 0,
-			0);
+		//setDataStreaming(10, 1, mask::FILTERED_ROLL_IMU, 0,
+		//	0);
 
 		return true;
 	}
@@ -937,9 +937,6 @@ void Sphero::updateParameters(int nbFrames, uint32_t maskVal, uint32_t mask2Val)
 	if(maskVal & mask::FILTERED_ACCEL_X)
 		_typesLst.push_back(dataTypes::FILTERED_ACCEL_X);
 
-	if(maskVal & mask::FILTERED_ACCEL_X)
-		_typesLst.push_back(dataTypes::FILTERED_ACCEL_X);
-
 	if(maskVal & mask::FILTERED_ACCEL_Y)
 		_typesLst.push_back(dataTypes::FILTERED_ACCEL_Y);
 
@@ -988,6 +985,11 @@ void Sphero::updateParameters(int nbFrames, uint32_t maskVal, uint32_t mask2Val)
 const vector<dataTypes> Sphero::getTypesList()
 {
 	return _typesLst;
+}
+
+int Sphero::getNumberOfStreaming()
+{
+	return (int)_typesLst.size();
 }
 
 
