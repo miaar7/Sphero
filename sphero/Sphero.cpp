@@ -147,79 +147,6 @@ Sphero::~Sphero()
 
 //--------------------------------------------------------- Public methods
 
-void Sphero::rollToPosition(spherocoord_t x, spherocoord_t y, uint8_t initSpeed)
-{
-
-	spherocoord_t actualX, actualY;
-	uint8_t speed = initSpeed;
-
-	enableCollisionDetection(90, 30, 90, 30, 90);
-
-	collision = false;
-
-	actualX = getX();
-	actualY = getY();
-
-	unsigned int sleeptime;
-
-	int angle;
-	size_t nbPoints = 0;
-	//roll(45, 0);
-	//usleep(6000);
-
-	int i = 0;
-
-	while( (abs(actualX - x) > 2 || abs(actualY- y) > 2 || speed > 35) && !collision )
-	{
-		if(i <= 6)
-			speed = 60;
-		else
-			speed = min(20 + max(abs(actualX - x), abs(actualY- y)), 100);
-		i++;
-		sleeptime = 3000;
-
-		angle = ((int) (atan2(x - actualX, y - actualY)
-					* 180.0 / 3.14159268) + 360) % 360;
-		
-	/*	std::cout << "Speed : " << (uint32_t)speed << endl << "Angle : " << angle << endl;
-		std::cout << "ActualX : " << actualX << endl << "ActualY : " << actualY << endl;
-*/
-		roll(speed, angle);
-		usleep(5*sleeptime);
-		roll(0, angle);
-
-		if(abs(getSpeedX()) < 10 && abs(getSpeedY()) < 10)
-		{
-			if(nbPoints++ > 40)
-			{
-				roll(0,angle);
-				return;
-			}
-		}
-		else
-		{
-			nbPoints = 0;
-		}
-
-		usleep(3*sleeptime);
-
-		actualX = getX();
-		actualY = getY();
-
-	}
-	roll(0,angle);
-}
-
-uint16_t Sphero::getNormalisedSpeed()
-{
-	return _normalisedSpeed;
-}
-
-void Sphero::setNormalisedSpeed(uint16_t normalisedSpeed)
-{
-	_normalisedSpeed = normalisedSpeed;
-}
-
 int Sphero::wake()
 {
 	char message1[8] = { ATT::WRT, handle::ADOS, 0x00, 0x30, 0x31, 0x31 ,0x69 ,0x33 };
@@ -239,7 +166,6 @@ int Sphero::wake()
 	}
 	return 0;
 }
-
 
 /**
  * @brief connect : Initializes the bluetooth connection to the sphero instance
@@ -311,44 +237,11 @@ void Sphero::disconnect()
 }//END disconnect
 
 
-void Sphero::setX(spherocoord_t x)
-{
-	_x = x;
-}
-void Sphero::setY(spherocoord_t y)
-{
-	_y = y;
-}
-void Sphero::setSpeedX(int16_t speedx)
-{
-	_speedX = speedx;
-}
-void Sphero::setSpeedY(int16_t speedy)
-{
-	_speedY = speedy;
-}
-
 bool Sphero::getCollision(void)
 {
 	return collision;
 }
 
-int16_t Sphero::getX()
-{
-	return _x;
-}
-int16_t Sphero::getY()
-{
-	return _y;
-}
-int16_t Sphero::getSpeedX()
-{
-	return _speedX;
-}
-int16_t Sphero::getSpeedY()
-{
-	return _speedY;
-}
 
 /**
  * @brief ping : Creates a ping request to the Sphero
@@ -554,6 +447,27 @@ void Sphero::setRotationRate(uint8_t angspeed)
 				);
 	sendPacket(packet);
 }//END setRotationRate
+
+void Sphero::setRawMotor(uint8_t LMode, uint8_t LPower, uint8_t RMode, uint8_t RPower)
+{
+	uint8_t data_payload[4];
+	data_payload[0] = LMode;
+	data_payload[1] = LPower;
+	data_payload[2] = RMode;
+	data_payload[3] = RPower;
+
+	ClientCommandPacket packet(
+		DID::sphero,
+		CID::setRawMotorValues,
+		flags::notNeeded,
+		0x05,
+		data_payload,
+		_waitConfirm,
+		_resetTimer
+	);
+	sendPacket(packet);
+}//END setRawMotor
+
 
 
 /**

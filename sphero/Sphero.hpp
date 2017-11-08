@@ -179,11 +179,33 @@ class Sphero
 
 
 		/**
-		 * @brief setRotationRate : Change the rotation speed
-		 * @param angspeed : The new rotation speed (new speed will be angspeed*0.784 degrees/sec)
+		 * @brief setRotationRate : This allows you to control the rotation rate that Sphero will use to meet new heading commands
+		 * A lower value offers better control but with a larger turning radius. A higher value will yield quick turns but Sphero may roll over on itself and lose control.
+		 * @param angspeed : The new rotation speed (new speed will be angspeed*0.784 degrees/sec)  maximum (currently 400 degrees/sec)
 		 *		Warning :=: high value may become really uncontrollable
 		 */
 		void setRotationRate(uint8_t angspeed = 0xc8);
+
+		/**
+		* @brief setRawMotor: Sets a speed on each motor directly
+		* @param Lmode Sets the mode og left motor: Disponible options are:
+		*		00h	Off (motor is open circuit)
+		*		01h	Forward
+		*		02h	Reverse
+		*		03h	Brake (motor is shorted)
+		*		04h	Ignore (motor mode and power is left unchanged)
+		* @param LPower Requested left motor output 0-255
+		@param Rmode Sets the mode og left motor: Disponible options are:
+		*		00h	Off (motor is open circuit)
+		*		01h	Forward
+		*		02h	Reverse
+		*		03h	Brake (motor is shorted)
+		*		04h	Ignore (motor mode and power is left unchanged)
+		* @param RPower Requested right motor output 0-255
+		*
+		* WARNING!!  - This command will disable stabilization if both modes aren't "ignore" so you'll need to re-enable it via CID 02h (setStabilization) once you're done.
+		*/
+		void setRawMotor(uint8_t LMode, uint8_t LPower, uint8_t RMode, uint8_t RPower);
 
 
 		/**
@@ -228,7 +250,6 @@ class Sphero
 		void setSelfLevel(uint8_t options = 0, uint8_t angle_limit = 3,
 						  uint8_t timeout = 15, uint8_t trueTime = 30);
 
-		void rollToPosition(spherocoord_t x, spherocoord_t y, uint8_t initSpeed = 90);
 
 		/**
 		 * @brief enableCollisionDetection : Enables the onBoard collision
@@ -269,16 +290,7 @@ class Sphero
 		 */
 		bool isConnected();
 
-		void setX(spherocoord_t x);
-		void setY(spherocoord_t y);
-		void setSpeedX(int16_t speedx);
-		void setSpeedY(int16_t speedy); //vas donc, vas donc chez speedy, speedy !
 		
-		int16_t getX();
-		int16_t getY();
-		int16_t getSpeedX();
-		int16_t getSpeedY();
-
 		/**
 		 * @brief configureLocator : Configure sphero's internal location
 		 * 							 calculation unit offsets
@@ -345,71 +357,6 @@ class Sphero
 		void roll(uint8_t speed, uint16_t heading, uint8_t state = 1);
 
 
-		//setRawMotorValue : not needed ?
-
-		/**
-		 * @brief setMotionTimeout : This sets the ultimate timeout for the
-		 * 							last motion command to keep Sphero from
-		 *							rolling away in the case of a crashed (or
-		 *							paused) client app.
-		 *
-		 * @param time : Expressed in milliseconds. Defaults to 2000 upon wake-up.
-		 */
-		void setMotionTimeout(uint16_t time);
-
-		/**
-		 * @brief setPermOptFlags : Assigns the permanent option flags to the
-		 * 							provided value and writes them to the config
-		 * 							block for persistence across power cycles.
-		 * @param flags :
-		 *			OPT_PREVENT_SLEEP : Prevent Sphero from immediately going
-		 *								to sleep when placed in the charger and
-		 * 								connected over Bluetooth.
-		 *			OPT_EN_VDRIVE : Enable Vector Drive, that is, when Sphero
-		 *							is stopped and a new roll command is issued
-		 * 							it achieves the heading before moving along it
-		 *			OPT_DIS_CHARGER_SL : Disable self-leveling when Sphero is
-		 *								 inserted into the charger.
-		 *			OPT_FORCE_TAIL_LED : Force the tail LED always on.
-		 *			OPT_EN_MOTION_TO : Enable motion timeouts
-		 *			OPT_EN_RETAIL_DEMO : Enable retail Demo Mode (when placed
-		 *								 in the charger, ball runs a slow
-		 *								 rainbow macro for 60 minutes and then
-		 *								 goes to sleep).
-		 */
-		void setPermOptFlags(uint32_t flags);
-
-		//getPermOptFlags : we'll see
-
-		/**
-		 * @brief setTmpOptFlags : Assigns the temporary option flags to the
-		 * 						   provided value. These do not persist across
-		 * 						   a power cycle.
-		 * @param flags
-		 *			TOPT_EN_STOP_ON_DISC : when the Bluetooth link transitions
-		 *								   from connected to disconnected,
-		 *								   Sphero is commanded to stop rolling.
-		 *								   This is ignored if a macro or orbBasic
-		 *								   program is running though both have
-		 *								   option flags to allow this during
-		 *								   their execution.
-		 *
-		 *									This flag is cleared after it is
-		 *									obeyed, thus it is a one-shot.
-		 */
-		void setTmpOptFlags(uint32_t flags);
-
-
-		//getTmpOptFlags : we'll see
-
-
-		/**
-		 * @brief setDeviceMode
-		 * @param value :
-		 *			0x01 : user hack mode
-		 */
-		void setDeviceMode(uint8_t value = 0);
-
 		
 
 		//getDeviceMode
@@ -428,19 +375,6 @@ class Sphero
 		 */
 		BTInfoStruct* getBTInfo();
 
-		/**
-		 * @brief runMacro : This attempts to execute the specified macro
-		 * @param id : Macro IDs are organized into groups
-		 *			01-31 : 	System Macros. Compiled into the Main Application.
-		 *						Always available to run, cannot be deleted.
-		 *			32-253 : 	User Macros. Downloaded and permanently stored,
-		 *					 	can be deleted in total.
-		 *			254 : 		Stream Macro, a special user macro that doesn't
-		 *						require this call to begin execution
-		 *			255 : 		Temporary Macro, a special user macro that's
-		 *						held in RAM for execution
-		 */
-		void runMacro(uint8_t id);
 
 		//TODO quelqu'un : implémenter les fonctions de setMacro (parce que ça 
 		//sert pas à grand chose de pouvoir les lancer si on en a pas) 
@@ -540,6 +474,7 @@ class Sphero
 		 * @param callback : The callback function to assign to this event
 		 *			Return type : void
 		 *			Parameters : none (void)
+		 * Not implemented!!!!!
 		 */
 		void onPreSleep(callback_preSleep_t callback);
 
