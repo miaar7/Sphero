@@ -22,7 +22,7 @@ uint8_t packet_toolbox::checksum(uint8_t* packet_data, size_t len)
 	for(size_t i = 0 ; i < len ; checksum += packet_data[i++])
 	{ }
 
-		//Inverting result sum
+	//Inverting result sum
 	checksum ^= 0xFF;
 
 	return checksum;

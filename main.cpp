@@ -28,10 +28,11 @@ int main(void) {
 	int sensorsStreaming = 0;
 	struct timeval randomSend;
 
-	float sinWave[] = { 100, 87.21, 74.63, 62.47, 50.93, 40.19, 30.43, 21.82, 14.49, 8.56, 4.13, 1.28, 0.05, 0.46, 2.51, 6.15, 11.34, 17.98, 25.97, 35.18, 45.45, 56.61, 68.49, 80.88, 93.59, 106.41, 119.12, 131.51, 143.39, 154.55, 164.82, 174.03, 182.02, 188.66, 193.85, 197.49, 199.54, 199.95, 198.72, 195.87, 191.44, 185.51, 178.18, 169.57, 159.81, 149.07, 137.53, 125.37, 112.79, 100 };
+	float sinWave[] = { 100, 87.21, 74.63, 62.47, 50.93, 40.19, 30.43, 21.82, 
+	14.49, 8.56, 4.13, 1.28, 0.05, 0.46, 2.51, 6.15, 11.34, 17.98, 25.97, 35.18, 45.45, 56.61, 68.49, 80.88, 93.59, 106.41, 119.12, 131.51, 143.39, 154.55, 164.82, 174.03, 182.02, 188.66, 193.85, 197.49, 199.54, 199.95, 198.72, 195.87, 191.44, 185.51, 178.18, 169.57, 159.81, 149.07, 137.53, 125.37, 112.79, 100 };
 
-	//string address = "CD:72:26:BA:E7:32";
-	string address = "C5:A2:54:D0:39:C9";
+	//string address = "CD:72:26:BA:E7:32"; Sphero1
+	string address = "C5:A2:54:D0:39:C9"; //Sphero2
 
 	Sphero* sph = new Sphero(address.c_str(), new bluez_adaptor());
 
@@ -45,6 +46,8 @@ int main(void) {
 	sph->onData([sph,pFile, &tv,&startTimeSec, &startTimeuSec, &freq, &sensorsStreaming, &sinWave, &sensors]() {
 		static int i = 0;
 		sph->setRawMotor(1, sinWave[i], 1, sinWave[i]); // Send as soon a message is recieved and interpretet
+		
+		// Increment sinewave
 		if (i < sizeof(sinWave) / sizeof(sinWave[0]) - 1) {
 			i++;
 		}
@@ -54,6 +57,7 @@ int main(void) {
 		}
 		
 		uint16_t value;
+
 		sensors->getValue(dataTypes::RAW_RIGHT_MOTOR_PWM, value);
 		gettimeofday(&tv, NULL);
 		long int timeStamp = (tv.tv_sec - startTimeSec) * 1000000 + (tv.tv_usec - startTimeuSec);
@@ -122,7 +126,6 @@ int main(void) {
 			// Loop for 30 sec. 
 			while (currentTimeSec- startTimeSec < 30)
 			{
-
 				
 				//Used when Random send		
 				
@@ -137,7 +140,7 @@ int main(void) {
 				currentTimeSec = randomSend.tv_sec;
 				currentTimeuSec = randomSend.tv_usec;
 
-			}			
+			}		
 	
 
 			//cout << "j: " << j << " i: " << i << endl;

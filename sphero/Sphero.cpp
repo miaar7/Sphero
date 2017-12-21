@@ -147,6 +147,10 @@ Sphero::~Sphero()
 
 //--------------------------------------------------------- Public methods
 
+/**
+* @brief wake : Wakes op the Sphero
+* @return true -1 if an error occured. Otherwise 0
+*/
 int Sphero::wake()
 {
 	char message1[8] = { ATT::WRT, handle::ADOS, 0x00, 0x30, 0x31, 0x31 ,0x69 ,0x33 };
@@ -192,11 +196,6 @@ bool Sphero::connect()
 
 		_connected = true;
 		_connect_handler.reportAction();
-
-		//setDataStreaming(2, 1, 0, 0,
-		//		mask2::ODOMETER_X | mask2::ODOMETER_Y | mask2::ACCELONE_0 |mask2::VELOCITY_X | mask2::VELOCITY_Y);
-		//setDataStreaming(10, 1, mask::FILTERED_ROLL_IMU, 0,
-		//	0);
 
 		return true;
 	}
