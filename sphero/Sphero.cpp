@@ -447,6 +447,25 @@ void Sphero::setRotationRate(uint8_t angspeed)
 	sendPacket(packet);
 }//END setRotationRate
 
+ /**
+ * @brief setRawMotor: Sets a speed on each motor directly
+ * @param Lmode Sets the mode og left motor: Disponible options are:
+ *		00h	Off (motor is open circuit)
+ *		01h	Forward
+ *		02h	Reverse
+ *		03h	Brake (motor is shorted)
+ *		04h	Ignore (motor mode and power is left unchanged)
+ * @param LPower Requested left motor output 0-255
+ @param Rmode Sets the mode og left motor: Disponible options are:
+ *		00h	Off (motor is open circuit)
+ *		01h	Forward
+ *		02h	Reverse
+ *		03h	Brake (motor is shorted)
+ *		04h	Ignore (motor mode and power is left unchanged)
+ * @param RPower Requested right motor output 0-255
+ *
+ * WARNING!!  - This command will disable stabilization if both modes aren't "ignore" so you'll need to re-enable it via CID 02h (setStabilization) once you're done.
+ */
 void Sphero::setRawMotor(uint8_t LMode, uint8_t LPower, uint8_t RMode, uint8_t RPower)
 {
 	uint8_t data_payload[4];
